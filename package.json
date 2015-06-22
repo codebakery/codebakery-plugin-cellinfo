@@ -1,0 +1,25 @@
+{
+  "name": "codebakery-plugin-cellinfo",
+  "version": "0.0.1",
+  "cordova": {
+    "id": "codebakery-plugin-cellinfo",
+    "platforms": [
+      "android",
+      "ios",
+    ]
+  },
+  "description": "CodeBakery Cell Info Plugin",
+  "repo": "https://github.com/codebakery/codebakery-plugin-cellinfo.git",
+  "issue": "https://github.com/codebakery/codebakery-plugin-cellinfo/issues",
+  "keywords": [
+    "codebakery",
+    "cordova",
+    "cellinfo",
+    "cell",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+  ],
+  "author": "CodeBakery",
+  "license": "Apache 2.0"
+}
