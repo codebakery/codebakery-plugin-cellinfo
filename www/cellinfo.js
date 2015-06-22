@@ -19,19 +19,19 @@ var CellInfo = function() {
 };
 
 
-CellInfo.getNeighboringCellInfo = function(successCallback, errorCallback) {
+CellInfo.prototype.getNeighboringCellInfo = function(successCallback, errorCallback) {
     argscheck.checkArgs('fF', 'CellInfo.getNeighboringCellInfo', arguments);
     exec(successCallback, errorCallback, 'CellInfo', 'getNeighboringCellInfo', []);
 };
 
-CellInfo.getPrimaryCellInfo = function(successCallback, errorCallback) {
+CellInfo.prototype.getPrimaryCellInfo = function(successCallback, errorCallback) {
     argscheck.checkArgs('fF', 'CellInfo.getPrimaryCellInfo', arguments);
     exec(successCallback, errorCallback, 'CellInfo', 'getPrimaryCellInfo', []);
 };
 
-CellInfo.getNetworkType = function(successCallback, errorCallback) {
+CellInfo.prototype.getNetworkType = function(successCallback, errorCallback) {
     argscheck.checkArgs('fF', 'CellInfo.getNetworkType', arguments);
     exec(successCallback, errorCallback, 'CellInfo', 'getNetworkType', []);
 };
 
-module.exports = CellInfo;
+module.exports = new CellInfo();
