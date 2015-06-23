@@ -4,8 +4,7 @@
   "cordova": {
     "id": "codebakery-plugin-cellinfo",
     "platforms": [
-      "android",
-      "ios",
+      "android"
     ]
   },
   "description": "CodeBakery Cell Info Plugin",
@@ -17,8 +16,7 @@
     "cellinfo",
     "cell",
     "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios",
+    "cordova-android"
   ],
   "author": "CodeBakery",
   "license": "Apache 2.0"

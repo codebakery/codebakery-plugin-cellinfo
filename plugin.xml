@@ -25,16 +25,4 @@
         <source-file src="src/android/CellInfo.java" target-dir="src/io/codebakery/cellinfo" />
     </platform>
 
-    <!-- ios -->
-    <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="CellInfo">
-                <param name="ios-package" value="CBCellInfo"/>
-            </feature>
-        </config-file>
-
-        <header-file src="src/ios/CBCellInfo.h" />
-        <source-file src="src/ios/CBCellInfo.m" />
-    </platform>
-
 </plugin>

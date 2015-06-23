@@ -23,7 +23,6 @@ primary and neighboring cell information as well as network type.
 ### Supported Platforms
 
 - Android
-- iOS
 
 ### Android Installation
 
