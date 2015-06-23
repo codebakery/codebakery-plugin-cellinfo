@@ -3,15 +3,22 @@
 This plugin defines `window.CellInfo` object, which adds methods for getting
 primary and neighboring cell information as well as network type.
 
-## Properties
+## CellInfo object
 
-- window.CellInfo.networkType
+```javascript
+{
+    'cid': Number,          // cell ID in GSM
+    'lac': Number,          // LAC in GSM
+    'psc': Number,          // primary scrabling code for UMTS, -1 for UMTS
+    'networkType': String,  // network type string, e.g. 'GSM' or 'UMTS'
+    'rssi': Number          // received signal strength
+}
+```
 
 ## Methods
 
-- window.CellInfo.getNeighboringCellInfo
-- window.CellInfo.getPrimaryCellInfo
-- window.CellInfo.getNetworkType
+- window.CellInfo.getNeighboringCellInfo - returns list of *CellInfo* objects
+- window.CellInfo.getPrimaryCellInfo - returns *CellInfo* object
 
 ### Supported Platforms
 
