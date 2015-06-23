@@ -3,7 +3,7 @@
 This plugin defines `window.CellInfo` object, which adds methods for getting
 primary and neighboring cell information as well as network type.
 
-## CellInfo object
+## CellInfoData object
 
 ```javascript
 {
@@ -17,8 +17,8 @@ primary and neighboring cell information as well as network type.
 
 ## Methods
 
-- window.CellInfo.getNeighboringCellInfo - returns list of *CellInfo* objects
-- window.CellInfo.getPrimaryCellInfo - returns *CellInfo* object
+- window.CellInfo.getNeighboringCellInfo - returns list of **CellInfoData** objects
+- window.CellInfo.getPrimaryCellInfo - returns **CellInfoData** object
 
 ### Supported Platforms
 
