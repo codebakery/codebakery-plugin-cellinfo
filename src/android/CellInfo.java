@@ -13,23 +13,65 @@ import org.json.JSONException;
 import android.content.Context;
 import android.telephony.CellLocation;
 import android.telephony.NeighboringCellInfo;
+import android.telephony.PhoneStateListener;
+import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 
 public class CellInfo extends CordovaPlugin {
     public static final String TAG = "CellInfo";
-    private TelephonyManager telephonyManager;
 
-    /**
-     * Sets the context of the Command. This can then be used to do things like
-     * get file paths associated with the Activity.
-     *
-     * @param cordova The context of the main Activity.
-     * @param webView The CordovaWebView Cordova is running in.
-     */
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
-        this.telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+    private class PrimaryCellPhoneStateListener extends PhoneStateListener {
+        private CallbackContext callbackContext;
+        private CordovaInterface cordova;
+
+        public PrimaryCellPhoneStateListener(CordovaInterface cordova, CallbackContext callbackContext) {
+            super();
+            this.cordova = cordova;
+            this.callbackContext = callbackContext;
+        }
+
+        private void returnCellInfo(int gsmSignalStrength) throws JSONException {
+            JSONObject response = new JSONObject();
+            TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+            CellLocation location = telephonyManager.getCellLocation();
+            GsmCellLocation gsmLocation = (GsmCellLocation) location;
+
+            // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
+            int cid = gsmLocation.getCid();
+            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
+                response.put("cid", cid & 0xffff);
+            } else {
+                response.put("cid", cid);
+            }
+
+            response.put("lac", gsmLocation.getLac());
+            response.put("psc", gsmLocation.getPsc());
+            response.put("networkType", CellInfo.networkTypeToString(telephonyManager.getNetworkType()));
+            response.put("rssi", gsmSignalStrength);
+            callbackContext.success(response);
+        }
+
+        @Override
+        public void onSignalStrengthsChanged(SignalStrength signalStrength) {
+            try {
+                this.returnCellInfo(signalStrength.getGsmSignalStrength());
+            } catch (JSONException e) {
+                System.err.println("JSONException: " + e.getMessage());
+            }
+            this.unregister();
+        }
+
+        public void register() {
+            TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+            telephonyManager.listen(this, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
+        }
+
+        public void unregister() {
+            TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+            telephonyManager.listen(this, PhoneStateListener.LISTEN_NONE);
+        }
+
     }
 
     /**
@@ -42,29 +84,27 @@ public class CellInfo extends CordovaPlugin {
      */
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("getNeighboringCellInfo")) {
-            callbackContext.success(this.getNeighboringCellInfo());
+            this.getNeighboringCellInfo(callbackContext);
         } else if (action.equals("getPrimaryCellInfo")) {
-            callbackContext.success(this.getPrimaryCellInfo());
-        } else if (action.equals("getNetworkType")) {
-            callbackContext.success(this.getNetworkType());
-        }
-        else {
+            this.getPrimaryCellInfo(callbackContext);
+        } else {
             return false;
         }
         return true;
     }
 
 
-    private JSONArray getNeighboringCellInfo() throws JSONException {
+    private void getNeighboringCellInfo(CallbackContext callbackContext) throws JSONException {
         JSONArray response = new JSONArray();
-        List<NeighboringCellInfo> cellInfoList = this.telephonyManager.getNeighboringCellInfo();
+        TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        List<NeighboringCellInfo> cellInfoList = telephonyManager.getNeighboringCellInfo();
 
         for(final NeighboringCellInfo info : cellInfoList) {
             JSONObject jsonInfo = new JSONObject();
 
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = info.getCid();
-            if (this.telephonyManager.getNetworkType() == this.telephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
+            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
                 jsonInfo.put("cid", cid & 0xffff);
             } else {
                 jsonInfo.put("cid", cid);
@@ -72,32 +112,25 @@ public class CellInfo extends CordovaPlugin {
 
             jsonInfo.put("lac", info.getLac());
             jsonInfo.put("psc", info.getPsc());
-            jsonInfo.put("networkType", info.getNetworkType());
+            jsonInfo.put("networkType", CellInfo.networkTypeToString(info.getNetworkType()));
             jsonInfo.put("rssi", info.getRssi());
             response.put(jsonInfo);
         }
-        return response;
+        callbackContext.success(response);
     }
 
-    private JSONObject getPrimaryCellInfo() throws JSONException {
-        JSONObject response = new JSONObject();
-        CellLocation location = this.telephonyManager.getCellLocation();
-        GsmCellLocation gsmLocation = (GsmCellLocation) location;
-
-        // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
-        int cid = gsmLocation.getCid();
-        if (this.telephonyManager.getNetworkType() == this.telephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
-            response.put("cid", cid & 0xffff);
-        } else {
-            response.put("cid", cid);
-        }
-
-        response.put("lac", gsmLocation.getLac());
-        return response;
+    private void getPrimaryCellInfo(CallbackContext callbackContext) throws JSONException {
+        PrimaryCellPhoneStateListener listener = new PrimaryCellPhoneStateListener(cordova, callbackContext);
+        listener.register();
     }
 
-    private String getNetworkType() {
-        int networkType = this.telephonyManager.getNetworkType();
+    /**
+     * Converts NETWORK_TYPE_* constants to network type names.
+     *
+     * @param networkType       Network type constant (NETWORK_TYPE_*).
+     * @return                  Name of network type.
+     */
+    public static String networkTypeToString(int networkType) {
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_1xRTT: return "1xRTT";
             case TelephonyManager.NETWORK_TYPE_CDMA: return "CDMA";
