@@ -39,7 +39,11 @@ public class CellInfo extends CordovaPlugin {
 
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = gsmLocation.getCid();
-            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
+            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSDPA ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPA ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPAP &&
+                cid != -1) {
                 response.put("cid", cid & 0xffff);
             } else {
                 response.put("cid", cid);
@@ -104,7 +108,11 @@ public class CellInfo extends CordovaPlugin {
 
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = info.getCid();
-            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS && cid != -1) {
+            if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSDPA ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPA ||
+                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPAP &&
+                cid != -1) {
                 jsonInfo.put("cid", cid & 0xffff);
             } else {
                 jsonInfo.put("cid", cid);
