@@ -26,6 +26,6 @@ primary and neighboring cell information as well as network type.
 
 ### Android Installation
 
-API level 3+ supported.
+API level 7+ supported.
 
 Requires `ACCESS_COARSE_LOCATION` permission.
