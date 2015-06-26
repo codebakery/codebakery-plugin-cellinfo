@@ -39,10 +39,11 @@ public class CellInfo extends CordovaPlugin {
 
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = gsmLocation.getCid();
-            if ((telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSDPA ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPA ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
+            int networkType = telephonyManager.getNetworkType();
+            if ((networkType == TelephonyManager.NETWORK_TYPE_UMTS ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSDPA ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSPA ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
                 response.put("cid", cid & 0xffff);
             } else {
                 response.put("cid", cid);
@@ -50,7 +51,7 @@ public class CellInfo extends CordovaPlugin {
 
             response.put("lac", gsmLocation.getLac());
             response.put("psc", gsmLocation.getPsc());
-            response.put("networkType", CellInfo.networkTypeToString(telephonyManager.getNetworkType()));
+            response.put("networkType", CellInfo.networkTypeToString(networkType));
             response.put("rssi", gsmSignalStrength);
             callbackContext.success(response);
         }
@@ -107,10 +108,11 @@ public class CellInfo extends CordovaPlugin {
 
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = info.getCid();
-            if ((telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSDPA ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPA ||
-                telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
+            int networkType = info.getNetworkType();
+            if ((networkType == TelephonyManager.NETWORK_TYPE_UMTS ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSDPA ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSPA ||
+                networkType == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
                 jsonInfo.put("cid", cid & 0xffff);
             } else {
                 jsonInfo.put("cid", cid);
@@ -118,7 +120,7 @@ public class CellInfo extends CordovaPlugin {
 
             jsonInfo.put("lac", info.getLac());
             jsonInfo.put("psc", info.getPsc());
-            jsonInfo.put("networkType", CellInfo.networkTypeToString(info.getNetworkType()));
+            jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
             jsonInfo.put("rssi", info.getRssi());
             response.put(jsonInfo);
         }
