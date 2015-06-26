@@ -11,7 +11,7 @@
     <issue>https://github.com/codebakery/codebakery-plugin-cellinfo/issues</issue>
 
     <js-module src="www/cellinfo.js" name="CellInfo">
-        <clobbers target="window.CellInfo" />
+        <clobbers target="CellInfo" />
     </js-module>
 
     <!-- android -->
