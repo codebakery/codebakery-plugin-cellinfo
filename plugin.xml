@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="codebakery-plugin-cellinfo"
-    version="0.0.1">
+    version="0.0.2">
     <name>CellInfo</name>
     <description>CodeBakery Cell Info Plugin</description>
     <license>Apache 2.0</license>
