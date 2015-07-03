@@ -155,7 +155,7 @@ public class CellInfo extends CordovaPlugin {
     }
 
     /**
-     * Convert NETWORK_TYPE_* to general network type (GSM 2-3-4G, CDMA).
+     * Converts NETWORK_TYPE_* to general network type (GSM 2-3-4G, CDMA).
      *
      * @param networkType       Network type constant (NETWORK_TYPE_*).
      * @return                  2G, 3G, 4G or CDMA or null.
@@ -187,6 +187,13 @@ public class CellInfo extends CordovaPlugin {
         }
     }
 
+    /**
+     * Converts ASU signal strength level to dBM depending on network type.
+     *
+     * @param networkType       Network type constant (NETWORK_TYPE_*).
+     * @param asu               ASU signal strength level.
+     * @return                  Signal strength in dBm.
+     */
     private static int asuToDbm(int networkType, int asu) {
         if (CellInfo.networkTypeGeneral(networkType) == "2G") {
             return 2 * asu - 113;
