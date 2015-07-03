@@ -11,7 +11,7 @@ primary and neighboring cell information as well as network type.
     'lac': Number,          // LAC in GSM
     'psc': Number,          // primary scrabling code for UMTS, -1 for GSM
     'networkType': String,  // network type string, e.g. 'GSM' or 'UMTS'
-    'dbm': Number           // received signal strength in dBm
+    'rssi': Number           // received signal strength in dBm
 }
 ```
 

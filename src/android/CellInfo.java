@@ -49,7 +49,7 @@ public class CellInfo extends CordovaPlugin {
             response.put("lac", gsmLocation.getLac());
             response.put("psc", gsmLocation.getPsc());
             response.put("networkType", CellInfo.networkTypeToString(networkType));
-            response.put("dbm", CellInfo.asuToDbm(networkType, gsmSignalStrength));
+            response.put("rssi", CellInfo.asuToDbm(networkType, gsmSignalStrength));
             callbackContext.success(response);
         }
 
@@ -115,7 +115,7 @@ public class CellInfo extends CordovaPlugin {
             jsonInfo.put("lac", info.getLac());
             jsonInfo.put("psc", info.getPsc());
             jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
-            jsonInfo.put("dbm", CellInfo.asuToDbm(networkType, info.getRssi()));
+            jsonInfo.put("rssi", CellInfo.asuToDbm(networkType, info.getRssi()));
             response.put(jsonInfo);
         }
         callbackContext.success(response);
