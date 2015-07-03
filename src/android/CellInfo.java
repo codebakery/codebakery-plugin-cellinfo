@@ -135,7 +135,7 @@ public class CellInfo extends CordovaPlugin {
     }
 
     private void getPrimaryCellInfo(final CallbackContext callbackContext) {
-        PrimaryCellPhoneStateListener listener = new PrimaryCellPhoneStateListener(cordova, callbackContext);
+        final PrimaryCellPhoneStateListener listener = new PrimaryCellPhoneStateListener(cordova, callbackContext);
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 listener.register();
