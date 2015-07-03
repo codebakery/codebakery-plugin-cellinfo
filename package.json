@@ -1,6 +1,6 @@
 {
   "name": "codebakery-plugin-cellinfo",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "cordova": {
     "id": "codebakery-plugin-cellinfo",
     "platforms": [
