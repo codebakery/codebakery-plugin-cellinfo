@@ -40,7 +40,8 @@ public class CellInfo extends CordovaPlugin {
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = gsmLocation.getCid();
             int networkType = telephonyManager.getNetworkType();
-            if (CellInfo.networkTypeGeneral(networkType) == "3G" && cid != -1) {
+            String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
+            if (generalNetworkType == "3G" && cid != -1) {
                 response.put("cid", cid & 0xffff);
             } else {
                 response.put("cid", cid);
@@ -49,6 +50,7 @@ public class CellInfo extends CordovaPlugin {
             response.put("lac", gsmLocation.getLac());
             response.put("psc", gsmLocation.getPsc());
             response.put("networkType", CellInfo.networkTypeToString(networkType));
+            response.put("generalNetworkType", generalNetworkType);
             response.put("rssi", CellInfo.asuToDbm(networkType, gsmSignalStrength));
             callbackContext.success(response);
         }
@@ -106,7 +108,8 @@ public class CellInfo extends CordovaPlugin {
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = info.getCid();
             int networkType = info.getNetworkType();
-            if (CellInfo.networkTypeGeneral(networkType) == "3G" && cid != -1) {
+            String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
+            if (generalNetworkType == "3G" && cid != -1) {
                 jsonInfo.put("cid", cid & 0xffff);
             } else {
                 jsonInfo.put("cid", cid);
@@ -115,6 +118,7 @@ public class CellInfo extends CordovaPlugin {
             jsonInfo.put("lac", info.getLac());
             jsonInfo.put("psc", info.getPsc());
             jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
+            jsonInfo.put("generalNetworkType", generalNetworkType);
             jsonInfo.put("rssi", CellInfo.asuToDbm(networkType, info.getRssi()));
             response.put(jsonInfo);
         }
@@ -195,11 +199,13 @@ public class CellInfo extends CordovaPlugin {
      * @return                  Signal strength in dBm.
      */
     private static int asuToDbm(int networkType, int asu) {
-        if (CellInfo.networkTypeGeneral(networkType) == "2G") {
+        String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
+        if (generalNetworkType == "2G") {
             return 2 * asu - 113;
-        } else if(CellInfo.networkTypeGeneral(networkType) == "3G") {
+        } else if (generalNetworkType == "3G") {
             return asu - 116;
+        } else {
+            return asu;
         }
-        return asu;
     }
 }

@@ -7,11 +7,12 @@ primary and neighboring cell information as well as network type.
 
 ```javascript
 {
-    'cid': Number,          // cell ID in GSM
-    'lac': Number,          // LAC in GSM
-    'psc': Number,          // primary scrabling code for UMTS, -1 for GSM
-    'networkType': String,  // network type string, e.g. 'GSM' or 'UMTS'
-    'rssi': Number           // received signal strength in dBm
+    'cid': Number,                 // cell ID in GSM
+    'lac': Number,                 // LAC in GSM
+    'psc': Number,                 // primary scrabling code for UMTS, -1 for GSM
+    'networkType': String,         // network type string, e.g. 'GSM' or 'UMTS'
+    'generalNetworkType': String,  // general network type 2-3-4G, CDMA or null for unknown network types
+    'rssi': Number                 // received signal strength in dBm
 }
 ```
 
