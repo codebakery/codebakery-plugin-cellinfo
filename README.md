@@ -11,7 +11,7 @@ primary and neighboring cell information as well as network type.
     'lac': Number,                 // LAC in GSM
     'psc': Number,                 // primary scrabling code for UMTS, -1 for GSM
     'networkType': String,         // network type string, e.g. 'GSM' or 'UMTS'
-    'generalNetworkType': String,  // general network type 2-3-4G, CDMA or null for unknown network types
+    'generalNetworkType': String,  // general network type: '2G', '3G, '4G', 'CDMA' or 'Unknown'
     'rssi': Number                 // received signal strength in dBm
 }
 ```

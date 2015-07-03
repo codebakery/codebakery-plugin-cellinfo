@@ -41,7 +41,7 @@ public class CellInfo extends CordovaPlugin {
             int cid = gsmLocation.getCid();
             int networkType = telephonyManager.getNetworkType();
             String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
-            if (generalNetworkType == "3G" && cid != -1) {
+            if (generalNetworkType.equals("3G") && cid != -1) {
                 response.put("cid", cid & 0xffff);
             } else {
                 response.put("cid", cid);
@@ -60,7 +60,7 @@ public class CellInfo extends CordovaPlugin {
             try {
                 this.returnCellInfo(signalStrength.getGsmSignalStrength());
             } catch (JSONException e) {
-                System.err.println("JSONException: " + e.getMessage());
+                callbackContext.error("JSONException: " + e.getMessage());
             }
             this.unregister();
         }
@@ -85,7 +85,8 @@ public class CellInfo extends CordovaPlugin {
      * @param callbackContext   The callback id used when calling back into JavaScript.
      * @return                  True if the action was valid, false if not.
      */
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    @Override
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
         if (action.equals("getNeighboringCellInfo")) {
             this.getNeighboringCellInfo(callbackContext);
         } else if (action.equals("getPrimaryCellInfo")) {
@@ -97,37 +98,49 @@ public class CellInfo extends CordovaPlugin {
     }
 
 
-    private void getNeighboringCellInfo(CallbackContext callbackContext) throws JSONException {
-        JSONArray response = new JSONArray();
-        TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        List<NeighboringCellInfo> cellInfoList = telephonyManager.getNeighboringCellInfo();
+    private void getNeighboringCellInfo(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                JSONArray response = new JSONArray();
+                TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+                List<NeighboringCellInfo> cellInfoList = telephonyManager.getNeighboringCellInfo();
 
-        for(final NeighboringCellInfo info : cellInfoList) {
-            JSONObject jsonInfo = new JSONObject();
+                try {
+                    for(final NeighboringCellInfo info : cellInfoList) {
+                        JSONObject jsonInfo = new JSONObject();
 
-            // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
-            int cid = info.getCid();
-            int networkType = info.getNetworkType();
-            String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
-            if (generalNetworkType == "3G" && cid != -1) {
-                jsonInfo.put("cid", cid & 0xffff);
-            } else {
-                jsonInfo.put("cid", cid);
+                        // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
+                        int cid = info.getCid();
+                        int networkType = info.getNetworkType();
+                        String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
+                        if (generalNetworkType.equals("3G") && cid != -1) {
+                            jsonInfo.put("cid", cid & 0xffff);
+                        } else {
+                            jsonInfo.put("cid", cid);
+                        }
+
+                        jsonInfo.put("lac", info.getLac());
+                        jsonInfo.put("psc", info.getPsc());
+                        jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
+                        jsonInfo.put("generalNetworkType", generalNetworkType);
+                        jsonInfo.put("rssi", CellInfo.asuToDbm(networkType, info.getRssi()));
+                        response.put(jsonInfo);
+                    }
+                    callbackContext.success(response);
+                } catch (JSONException e) {
+                    callbackContext.error("JSONException: " + e.getMessage());
+                }
             }
-
-            jsonInfo.put("lac", info.getLac());
-            jsonInfo.put("psc", info.getPsc());
-            jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
-            jsonInfo.put("generalNetworkType", generalNetworkType);
-            jsonInfo.put("rssi", CellInfo.asuToDbm(networkType, info.getRssi()));
-            response.put(jsonInfo);
-        }
-        callbackContext.success(response);
+        });
     }
 
-    private void getPrimaryCellInfo(CallbackContext callbackContext) throws JSONException {
-        PrimaryCellPhoneStateListener listener = new PrimaryCellPhoneStateListener(cordova, callbackContext);
-        listener.register();
+    private void getPrimaryCellInfo(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                PrimaryCellPhoneStateListener listener = new PrimaryCellPhoneStateListener(cordova, callbackContext);
+                listener.register();
+            }
+        });
     }
 
     /**
@@ -159,10 +172,10 @@ public class CellInfo extends CordovaPlugin {
     }
 
     /**
-     * Converts NETWORK_TYPE_* to general network type (GSM 2-3-4G, CDMA).
+     * Converts NETWORK_TYPE_* to general network type ('2G', '3G, '4G', 'CDMA').
      *
      * @param networkType       Network type constant (NETWORK_TYPE_*).
-     * @return                  2G, 3G, 4G or CDMA or null.
+     * @return                  '2G', '3G, '4G', 'CDMA' or 'Unknown'.
      */
     private static String networkTypeGeneral(int networkType) {
         switch (networkType) {
@@ -187,7 +200,7 @@ public class CellInfo extends CordovaPlugin {
                 return "CDMA";
             case TelephonyManager.NETWORK_TYPE_UNKNOWN:
             default:
-                return null;
+                return "Unknown";
         }
     }
 
@@ -200,9 +213,9 @@ public class CellInfo extends CordovaPlugin {
      */
     private static int asuToDbm(int networkType, int asu) {
         String generalNetworkType = CellInfo.networkTypeGeneral(networkType);
-        if (generalNetworkType == "2G") {
+        if (generalNetworkType.equals("2G")) {
             return 2 * asu - 113;
-        } else if (generalNetworkType == "3G") {
+        } else if (generalNetworkType.equals("3G")) {
             return asu - 116;
         } else {
             return asu;
