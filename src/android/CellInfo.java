@@ -40,10 +40,7 @@ public class CellInfo extends CordovaPlugin {
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = gsmLocation.getCid();
             int networkType = telephonyManager.getNetworkType();
-            if ((networkType == TelephonyManager.NETWORK_TYPE_UMTS ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSDPA ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSPA ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
+            if (CellInfo.networkTypeGeneral(networkType) == "3G" && cid != -1) {
                 response.put("cid", cid & 0xffff);
             } else {
                 response.put("cid", cid);
@@ -52,7 +49,7 @@ public class CellInfo extends CordovaPlugin {
             response.put("lac", gsmLocation.getLac());
             response.put("psc", gsmLocation.getPsc());
             response.put("networkType", CellInfo.networkTypeToString(networkType));
-            response.put("rssi", gsmSignalStrength);
+            response.put("dbm", CellInfo.asuToDbm(networkType, gsmSignalStrength));
             callbackContext.success(response);
         }
 
@@ -109,10 +106,7 @@ public class CellInfo extends CordovaPlugin {
             // http://stackoverflow.com/questions/9808396/android-cellid-not-available-on-all-carriers
             int cid = info.getCid();
             int networkType = info.getNetworkType();
-            if ((networkType == TelephonyManager.NETWORK_TYPE_UMTS ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSDPA ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSPA ||
-                networkType == TelephonyManager.NETWORK_TYPE_HSPAP) && cid != -1) {
+            if (CellInfo.networkTypeGeneral(networkType) == "3G" && cid != -1) {
                 jsonInfo.put("cid", cid & 0xffff);
             } else {
                 jsonInfo.put("cid", cid);
@@ -121,7 +115,7 @@ public class CellInfo extends CordovaPlugin {
             jsonInfo.put("lac", info.getLac());
             jsonInfo.put("psc", info.getPsc());
             jsonInfo.put("networkType", CellInfo.networkTypeToString(networkType));
-            jsonInfo.put("rssi", info.getRssi());
+            jsonInfo.put("dbm", CellInfo.asuToDbm(networkType, info.getRssi()));
             response.put(jsonInfo);
         }
         callbackContext.success(response);
@@ -138,7 +132,7 @@ public class CellInfo extends CordovaPlugin {
      * @param networkType       Network type constant (NETWORK_TYPE_*).
      * @return                  Name of network type.
      */
-    public static String networkTypeToString(int networkType) {
+    private static String networkTypeToString(int networkType) {
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_1xRTT: return "1xRTT";
             case TelephonyManager.NETWORK_TYPE_CDMA: return "CDMA";
@@ -160,4 +154,45 @@ public class CellInfo extends CordovaPlugin {
         }
     }
 
+    /**
+     * Convert NETWORK_TYPE_* to general network type (GSM 2-3-4G, CDMA).
+     *
+     * @param networkType       Network type constant (NETWORK_TYPE_*).
+     * @return                  2G, 3G, 4G or CDMA or null.
+     */
+    private static String networkTypeGeneral(int networkType) {
+        switch (networkType) {
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+                return "2G";
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+                return "3G";
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+            case TelephonyManager.NETWORK_TYPE_LTE:
+                return "4G";
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                return "CDMA";
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+            default:
+                return null;
+        }
+    }
+
+    private static int asuToDbm(int networkType, int asu) {
+        if (CellInfo.networkTypeGeneral(networkType) == "2G") {
+            return 2 * asu - 113;
+        } else if(CellInfo.networkTypeGeneral(networkType) == "3G") {
+            return asu - 116;
+        }
+        return asu;
+    }
 }
