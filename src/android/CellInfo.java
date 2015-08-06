@@ -87,6 +87,11 @@ public class CellInfo extends CordovaPlugin {
      */
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
+        TelephonyManager telephonyManager = (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        int simState = telephonyManager.getSimState();
+        if (simState != TelephonyManager.SIM_STATE_READY) {
+            return false;
+        }
         if (action.equals("getNeighboringCellInfo")) {
             this.getNeighboringCellInfo(callbackContext);
         } else if (action.equals("getPrimaryCellInfo")) {
