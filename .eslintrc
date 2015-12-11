@@ -4,8 +4,10 @@
     "browser": true
   },
   "rules": {
-    "quotes": [2, "single"],
-    "strict": [0],
-    "eol-last": [0]
-  }
+    "quotes": [2, "single"]
+  },
+  "globals": {
+    "platform": true
+  },
+  "extends": "eslint:recommended"
 }
