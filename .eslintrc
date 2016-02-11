@@ -7,7 +7,7 @@
     "quotes": [2, "single"]
   },
   "globals": {
-    "platform": true
+    "cordova": true
   },
   "extends": "eslint:recommended"
 }

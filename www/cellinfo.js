@@ -6,7 +6,7 @@ var supportedPlatforms = [
 ];
 
 var CellInfo = {
-  isAvailable: (supportedPlatforms.indexOf(platform.id) > -1),
+  isAvailable: (supportedPlatforms.indexOf(cordova.platformId) > -1),
   getNeighboringCellInfo: function(successCallback, errorCallback) {
     argscheck.checkArgs('fF', 'CellInfo.getNeighboringCellInfo', arguments);
     exec(successCallback, errorCallback, 'CellInfo', 'getNeighboringCellInfo', []);
