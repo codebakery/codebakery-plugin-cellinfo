@@ -18,8 +18,8 @@ primary and neighboring cell information as well as network type.
 
 ## Methods
 
-- `window.CellInfo.getNeighboringCellInfo()` - returns list of **CellInfoData** objects
-- `window.CellInfo.getPrimaryCellInfo()` - returns **CellInfoData** object
+- `window.CellInfo.getNeighboringCellInfo(success: Function, error: Function)` - returns list of **CellInfoData** objects
+- `window.CellInfo.getPrimaryCellInfo(success: Function, error: Function)` - returns **CellInfoData** object
 
 ## Properties
 
